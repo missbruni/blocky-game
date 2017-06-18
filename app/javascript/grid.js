@@ -50,8 +50,45 @@ export class BlockGrid {
     return this;
   }
 
+  clearGrid() {
+    document.querySelector('#gridEl').innerHTML = '';
+    return this;
+  }
+
   blockClicked(e, block) {
-    console.log(e, block);
+    const { x, y, colour } = block;
+    if (colour !== null) {
+      this.removeBlock(x, y, colour)
+        .makeBlocksFall()
+        .clearGrid()
+        .render();
+    }
+  }
+
+  removeBlock(x, y, colour) {
+    if (this.grid[x] && this.grid[x][y] && this.grid[x][y].colour === colour) {
+      this.grid[x][y].colour = null;
+      this.removeBlock(x + 1, y, colour);
+      this.removeBlock(x - 1, y, colour);
+      this.removeBlock(x, y + 1, colour);
+      this.removeBlock(x, y - 1, colour);
+    }
+
+    return this;
+  }
+
+  makeBlocksFall() {
+    for (let x = 0; x < MAX_X; x++) {
+      for (let y = MAX_Y - 1; y >= 0; y--) {
+        let z = y;
+        while (this.grid[x][z].colour === null && this.grid[x][z + 1]) {
+          this.grid[x][z].colour = this.grid[x][z + 1].colour;
+          this.grid[x][z + 1].colour = null;
+          z++;
+        }
+      }
+    }
+    return this;
   }
 }
 
